@@ -1,0 +1,127 @@
+<h3>Today - index.phtml</h3>
+
+<?php 
+$index = 0;
+$steps = 0;
+$TemperatureValues = array();
+$WindSpeedValues = array();
+$DateTimeValues = array();
+$Minutes = array();
+$Hours = array();
+$Date = array();
+$HourInDeciaml = array();
+
+foreach($values as $value){
+    $TemperatureValues[$index] = $value->Temperature;
+    $WindSpeedValues[$index] = $value->WindSpeed;
+    $DateTimeValues[$index] = $value->DateTime;
+    $index++;
+}
+
+for($i=0; $i< count($DateTimeValues); $i++){
+    
+    $Date[$i] = substr($DateTimeValues[$i],0, 10);
+    //ins format hh:mm umwandeln
+    $DateTimeValues[$i] = substr($DateTimeValues[$i], 10, 6);
+    $Hours[$i] = substr($DateTimeValues[$i], 0, 3);
+    $Minutes[$i] = substr($DateTimeValues[$i],4, 2);
+    $HourInDeciaml[$i] = $Hours[$i] + ($Minutes[$i]/60);
+
+    if ($HourInDeciaml[$i] < ($HourInDeciaml[0]+1)) {
+        $steps ++; //sollten immer 4 sein, da wir alle 15 minuten einen neuen Wert bekommen
+    }
+}
+?>
+        <script>$(function () { 
+            $('.chart').highcharts({
+                   colors: ["#ff0000", "#55BF3B"],
+            
+                chart: {
+                    type: 'spline',
+                        backgroundColor: {
+                        linearGradient: [0, 0, 250, 500],
+                        stops: [
+                           [0, 'rgb(48, 96, 48)'],
+                           [1, 'rgb(0, 0, 0)']
+                        ]
+                     },
+                     borderColor: '#000000',
+                     borderWidth: 2,
+                     className: 'dark-container',
+                     plotBackgroundColor: 'rgba(255, 255, 255, .1)',
+                     plotBorderColor: '#CCCCCC',
+                     plotBorderWidth: 1,
+                },
+                title: {
+                  style: {
+                    color: '#C0C0C0',
+                    font: 'bold 16px "Trebuchet MS", Verdana, sans-serif'
+                  },
+                    text: 'Temperaturverlauf'
+                },
+                xAxis: {
+                    lineColor: '#A0A0A0',
+                    title: { 
+                        style: {
+                            color: '#C0C0C0',
+                            font: 'bold 16px "Trebuchet MS", Verdana, sans-serif'
+                        },
+                       enabled: true,
+                       text: 'Uhrzeit'
+                   },
+                   
+                labels: {    
+                    style: {
+                        color: '#C0C0C0',
+                        font: 'bold 16px "Trebuchet MS", Verdana, sans-serif'
+                    },
+                    step: <?php echo $steps; ?>
+                },
+                type: 'datetime',
+                },
+                yAxis: {
+                  labels: {    
+                    style: {
+                        color: '#C0C0C0',
+                        font: 'bold 16px "Trebuchet MS", Verdana, sans-serif'
+                    },
+                  },
+                    title: {
+                        style: {
+                            color: '#C0C0C0',
+                            font: 'bold 16px "Trebuchet MS", Verdana, sans-serif'
+                        },
+                        text: 'Value'
+                    },
+                },
+                
+                tooltip: {
+                    shared: true 
+            },
+            plotOptions: {
+            series: {
+                pointInterval: 900000, //15 min
+                pointStart: Date.UTC(<?php echo substr($Date[0], 0,4);?>,<?php echo substr($Date[0], 5,2)-1;?>,<?php echo substr($Date[0], 8,9);?>,<?php echo $Hours[0] ?>,<?php echo $Minutes[0]?>),  
+            },
+        },
+        legend: {
+            itemStyle: {
+                color: '#C0C0C0',
+                font: 'bold 16px "Trebuchet MS", Verdana, sans-serif'
+            },
+            itemHoverStyle: {
+               color: '#FFF'
+            },
+            itemHiddenStyle: {
+               color: '#444'
+            }
+        },
+            series: [{
+                name: 'Temperature',
+                data: [<?php echo join($TemperatureValues, ','); ?>]
+            }, {
+                name: 'Windspeed',
+                data: [<?php echo join($WindSpeedValues, ','); ?>]
+            }]
+        });
+    });</script>

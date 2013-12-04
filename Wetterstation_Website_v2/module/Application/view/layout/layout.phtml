@@ -1,0 +1,50 @@
+<?php echo $this->doctype(); ?>
+
+
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <?php echo $this->headTitle('Wetterstation')->setSeparator(' - ')->setAutoEscape(false) ?>
+
+        <?php echo $this->headMeta()->appendName('viewport', 'width=device-width, initial-scale=1.0') ?>
+
+        <!-- Le styles -->
+        <?php echo $this->headLink(array('rel' => 'shortcut icon', 'type' => 'image/vnd.microsoft.icon', 'href' => $this->basePath() . '/img/favicon.ico'))
+                        ->prependStylesheet($this->basePath() . '/css/bootstrap-responsive.min.css')
+                        ->prependStylesheet($this->basePath() . '/css/mainStyle.css')
+                        ->prependStylesheet($this->basePath() . '/css/bootstrap.min.css') ?>
+
+        <!-- Scripts -->
+        <?php echo $this->headScript()->prependFile($this->basePath() . '/js/html5.js', 'text/javascript', array('conditional' => 'lt IE 9',))
+                                      ->prependFile($this->basePath() . '/js/bootstrap.min.js')              
+                                      ->prependFile('http://code.highcharts.com/highcharts.js')
+                                      ->prependFile('http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js')?>
+
+                
+
+
+    </head>
+    <body>
+        <div class="body">
+            <div class="header">
+                <?php 
+                    use Application\Model\Forms\DayNightForm;
+                    $form = new DayNightForm();
+                    echo $this->form()->openTag($form);
+                    echo $this->formRow($form->get('time'));
+                    echo $this->form()->closeTag($form);
+
+                    echo $this->navigation('navigation')->menu()->setUlClass('navUl'); 
+                ?>          
+            </div>
+            <div class="wrapper">
+                <div class="mainContent"><?php echo $this->layout()->content; ?>
+                    <div class="chart"></div>
+                </div>
+                <div class="subContent"></div>
+            </div>
+
+            <div class="footer"></div>
+        </div>
+    </body>
+</html>
