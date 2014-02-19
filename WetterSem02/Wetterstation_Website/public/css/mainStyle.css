@@ -1,0 +1,125 @@
+/* 
+    Document   : mainStyle
+    Created on : 16.10.2013, 12:02:50
+    Author     : Domi
+    Description:
+       Purpose of the stylesheet follows.
+*/
+
+/*<<<Layout Styles>>>*/
+
+.body{
+    background-image: url(../img/background.JPG);
+    background-repeat: repeat-x; 
+}
+.header{
+    border: #8c8080 solid 2px;
+    margin: 0px auto 0px auto;
+    width: 1100px;
+    height: 60px;
+    background-color: #454545;
+}
+.wrapper{
+    border: #8c8080 solid 2px;
+    margin: 0px auto 0px auto;
+    width: 1000px;
+    min-height: 950px;
+    padding-left: 50px;
+    padding-right: 50px;
+    background-color: #d0e9c6;
+}
+.mainContent{
+    padding-top: 50px;
+    margin: 0px auto 0px auto;
+    width: 1000px;
+    min-height: 900px;
+    background-color: #d0e9c6;
+    float: left;
+}
+.chart{
+    text-align: center;
+    width: 100%;
+}
+.footer{
+    border: #8c8080 solid 2px;
+    margin: 0px auto 0px auto;
+    width: 1100px;
+    height: 60px;
+    background-color: #454545;
+    clear: both;
+}
+/*<<<<Nav Styles>>>>*/
+ul.navUl , ul.navUl  ul {
+    position: relative;
+    top: 15px;
+    padding:0;
+    margin: 0;
+}
+ul.navUl  li, ul.navUl  ul li {
+    list-style-type: none;
+    display: inline-block;
+    width : 125px;
+    padding-left: 115px;
+    text-align: center;
+}
+/*Link Appearance*/
+ul.navUl  li a, ul.navUl  li ul li a {
+    text-decoration: none;
+    color: #fff;
+    background: #666;
+    padding: 5px;
+    display:inline-block;
+    width : 125px;
+}
+/*Make the parent of sub-menu relative*/
+ul.navUl  li {
+    position: relative;
+}
+/*sub menu*/
+ul.navUl  li ul {
+    display:none;
+    position: absolute;
+    top: 30px;
+    left: 0px;
+    width: 100px;
+}
+ul.navUl li:hover ul {
+    display:block;
+}
+ul.navUl li ul a{
+    border-top: solid 2px white;
+    z-index: 1;
+}
+#menu-navMonthProcess{
+    position: relative;
+    top: -25px;
+}
+#menu-navYearProcess{
+    position: relative;
+    top: -50px;
+}
+#menu-navBetween2Dates{
+    position: relative;
+    top: -75px;
+}
+#menu-navCompare{
+    position: relative;
+    top: -100px;
+}
+
+ul.navUl li:hover > a{
+    font-style: italic;
+    font-weight: bolder;
+}
+ul.navUl li.active > a{
+    font-style: italic;
+    font-weight: bolder;
+}
+/* <<<<Header-Form-Styles>>>>*/
+
+#DayNightSelect{
+    position: relative;
+    top: 15px;
+    left: 750px;
+}
+

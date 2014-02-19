@@ -1,0 +1,159 @@
+
+<?php
+echo $this->form()->openTag($form);
+echo $this->formRow($form->get('from'));
+echo $this->formRow($form->get('to'));
+echo $this->formRow($form->get('submitButton'));
+echo $this->form()->closeTag();
+$from = $form->get('from')->getValue();
+$to = $form->get('to')->getValue();
+?>
+<?php 
+if ((count($values) == 0)&&($dateChosen == true)) {
+    echo "<h2>Leider wurden zwischen diesen Daten keine Messwerte aufgezeichnet!</h2>";
+}
+elseif($dateChosen == false){
+    echo "<h2>Bitte wählen Sie 2 Daten aus!</h2>";
+}
+else{
+    echo "<h2>Temperaturverlauf von $from bis $to</h2>";
+}?>
+<div class="chart"></div>
+<?php 
+
+$index = 0;
+$TemperatureValues = array();
+$WindSpeedValues = array();
+$DateTimeValues = array();
+
+foreach($values as $value){
+    $TemperatureValues[$index] = ($value->Temperature == '') ? 'null' : $value->Temperature;
+    $WindSpeedValues[$index] = ($value->WindSpeed == '') ? 'null' : $value->WindSpeed;
+    $DateTimeValues[$index] = $value->DateTime;
+    $index++;
+}
+?>
+
+<script>$(function () { 
+            $('.chart').highcharts({
+                colors: ["#ff0000", "#55BF3B"],
+            
+                chart: {
+                    type: 'spline',
+                        backgroundColor: {
+                        linearGradient: [0, 0, 250, 500],
+                        stops: [
+                           [0, 'rgb(48, 96, 48)'],
+                           [1, 'rgb(0, 0, 0)']
+                        ]
+                     },
+                     borderColor: '#000000',
+                     borderWidth: 2,
+                     className: 'dark-container',
+                     plotBackgroundColor: 'rgba(255, 255, 255, .1)',
+                     plotBorderColor: '#CCCCCC',
+                     plotBorderWidth: 1,
+                },
+                title: {
+                  style: {
+                    color: '#C0C0C0',
+                    font: 'bold 16px "Trebuchet MS", Verdana, sans-serif'
+                  },
+                    text: 'Wetterverlauf'
+                },
+                xAxis: {
+                    title: { 
+                       enabled: true,
+                       text: 'Datum und Uhrzeit'
+                   },
+                   labels: {
+                    style: {
+                        color: '#C0C0C0',
+                    },
+                },
+                type: 'datetime',
+                },
+                yAxis: [{
+                    title: {
+                        text: 'Temperatur'
+                    },
+                    
+                    labels: {
+                            formatter: function() {
+                            return this.value +' C°';
+                        }, 
+                        style: {
+                            color: '#C0C0C0',
+                        },
+                    },
+                    opposite: true,
+                }
+                ,{ // Secondary yAxis
+                gridLineWidth: 0,
+                title: {
+                    text: 'Windstärke',
+                },
+                labels: {
+                    formatter: function() {
+                        return this.value +' km/h';
+                    },
+                    style: {
+                        color: '#C0C0C0'
+                    }
+                }
+                }],  
+                tooltip: {
+                    shared: true,
+                    crosshairs: true
+                },
+                plotOptions: {
+                series: {
+                    cursor: 'pointer',
+                    point: {
+                        events: {
+                            click: function() {
+                                hs.htmlExpand(null, {
+                                    pageOrigin: {
+                                        x: this.pageX,
+                                        y: this.pageY
+                                    },
+                                    headingText: this.series.name,
+                                    maincontentText: Highcharts.dateFormat('%A, %b %e, %Y', this.x) +':<br/> '+
+                                        this.y,
+                                });
+                            }
+                        }
+                    },
+                }
+            },
+            series: [{
+                name: 'Temperatur',
+                yAxis: 0,
+                data:[
+                    <?php $index = 0;
+                    foreach($DateTimeValues as $dateTime){
+                        echo "[Date.UTC(". substr($dateTime, 0,4) . "," . (substr($dateTime, 5,2)-1) . "," . substr($dateTime, 8,2) . "," . substr($dateTime, 11,2) . "," . substr($dateTime, 14,2)."),$TemperatureValues[$index]],\n";
+                        $index++;
+                    } ?>
+                ],
+                tooltip: {
+                    valueSuffix: ' C°'
+                }},{
+                name: 'Windstärke', 
+                yAxis: 1,
+                data:[
+                    <?php $index = 0;
+                    foreach($DateTimeValues as $dateTime){
+                        echo "[Date.UTC(". substr($dateTime, 0,4) . "," . (substr($dateTime, 5,2)-1) . "," . substr($dateTime, 8,2) . "," . substr($dateTime, 11,2) . "," . substr($dateTime, 14,2)."),$WindSpeedValues[$index]],\n";
+                        $index++;
+                    } ?>
+                ],
+                tooltip: {
+                    valueSuffix: ' km/h'
+                }}],
+                legend: {enabled:false}
+        });
+    });</script>
+
+
+        

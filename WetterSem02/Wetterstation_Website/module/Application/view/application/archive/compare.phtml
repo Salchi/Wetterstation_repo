@@ -1,0 +1,221 @@
+
+<?php
+echo $this->form()->openTag($form);
+echo "<h3>Datenreihe 1</h3>";
+echo $this->formRow($form->get('from1'));
+echo $this->formRow($form->get('to1'));
+echo "<h3>Datenreihe 2</h3>";
+echo $this->formRow($form->get('from2'));
+echo $this->formRow($form->get('to2'));
+echo $this->formRow($form->get('submitButton'));
+echo $this->form()->closeTag();
+?>
+<?php
+if ((count($values1) == 0) || (count($values2) == 0) && ($dateChosen == true)) {
+    echo "<h2>Leider wurden zwischen diesen Daten keine Messwerte aufgezeichnet!</h2>";
+} elseif ($dateChosen == false) {
+    echo "<h2>Bitte wählen Sie 2 Datenreihen aus!</h2>";
+} else {
+    echo "<h2>Temperaturverlauf von den 2 Datenreihen</h2>";
+}
+?>
+<div class="chart"></div>
+<?php
+$index = 0;
+$TemperatureValues1 = array();
+$WindSpeedValues1 = array();
+$DateTimeValues1 = array();
+
+foreach ($values1 as $value) {
+    $TemperatureValues1[$index] = ($value->Temperature == '') ? 'null' : $value->Temperature;
+    $WindSpeedValues1[$index] = ($value->WindSpeed == '') ? 'null' : $value->WindSpeed;
+    $DateTimeValues1[$index] = $value->DateTime;
+    $index++;
+}
+$index = 0;
+$TemperatureValues2 = array();
+$WindSpeedValues2 = array();
+$DateTimeValues2 = array();
+
+foreach ($values2 as $value) {
+    $TemperatureValues2[$index] = ($value->Temperature == '') ? 'null' : $value->Temperature;
+    $WindSpeedValues2[$index] = ($value->WindSpeed == '') ? 'null' : $value->WindSpeed;
+    $DateTimeValues2[$index] = $value->DateTime;
+    $index++;
+}
+?>
+
+<script>$(function() {
+        $('.chart').highcharts({
+            colors: ["#ff0000", "#55BF3B"],
+            chart: {
+                type: 'spline',
+                backgroundColor: {
+                    linearGradient: [0, 0, 250, 500],
+                    stops: [
+                        [0, 'rgb(48, 96, 48)'],
+                        [1, 'rgb(0, 0, 0)']
+                    ]
+                },
+                borderColor: '#000000',
+                borderWidth: 2,
+                className: 'dark-container',
+                plotBackgroundColor: 'rgba(255, 255, 255, .1)',
+                plotBorderColor: '#CCCCCC',
+                plotBorderWidth: 1,
+            },
+            title: {
+                style: {
+                    color: '#C0C0C0',
+                    font: 'bold 16px "Trebuchet MS", Verdana, sans-serif'
+                },
+                text: 'Wetterverlauf'
+            },
+            xAxis: [{
+                    title: {
+                        enabled: true,
+                        text: 'Datum und Uhrzeit Datenreihe 1'
+                    },
+                    labels: {
+                        style: {
+                            color: '#C0C0C0',
+                        },
+                    },
+                    type: 'datetime',
+                }
+                , {// Secondary xAxis
+                    title: {
+                        text: 'Datum und Uhrzeit Datenreihe 2',
+                    },
+                    labels: {
+                        style: {
+                            color: '#C0C0C0'
+                        }
+                    },
+                    opposite: true,
+                    type: 'datetime',
+                }],
+            yAxis: [{
+                    title: {
+                        text: 'Temperatur'
+                    },
+                    labels: {
+                        formatter: function() {
+                            return this.value + ' C°';
+                        },
+                        style: {
+                            color: '#C0C0C0',
+                        },
+                    }
+                }
+                , {// Secondary yAxis
+                    gridLineWidth: 0,
+                    title: {
+                        text: 'Windstärke',
+                    },
+                    labels: {
+                        formatter: function() {
+                            return this.value + ' km/h';
+                        },
+                        style: {
+                            color: '#C0C0C0'
+                        }
+                    },
+                    opposite: true,
+                }],
+            tooltip: {
+                shared: true,
+                crosshairs: true
+            },
+            plotOptions: {
+                series: {
+                    cursor: 'pointer',
+                    marker: {
+                        enabled: false
+                    },
+                    events: {
+                        click: function() {
+                            hs.htmlExpand(null, {
+                                pageOrigin: {
+                                    x: this.pageX,
+                                    y: this.pageY
+                                },
+                                headingText: this.series.name,
+                                maincontentText: Highcharts.dateFormat('%A, %b %e, %Y', this.x) + ':<br/> ' +
+                                        this.y,
+                            });
+                        }
+                    }
+                },
+            },
+            series: [{
+                    name: 'Temperatur Datenreihe 1',
+                    yAxis: 0,
+                    xAxis: 0,
+                    color: '#FF0000',
+                    data: [
+<?php
+$index = 0;
+foreach ($DateTimeValues1 as $dateTime) {
+    echo "[Date.UTC(" . substr($dateTime, 0, 4) . "," . (substr($dateTime, 5, 2) - 1) . "," . substr($dateTime, 8, 2) . "," . substr($dateTime, 11, 2) . "," . substr($dateTime, 14, 2) . "),$TemperatureValues1[$index]],\n";
+    $index++;
+}
+?>
+                    ],
+                    tooltip: {
+                        valueSuffix: ' C°'
+                    }}, {
+                    name: 'Windstärke Datenreihe 1',
+                    yAxis: 1,
+                    xAxis: 0,
+                    color: '#01DF01',
+                    data: [
+<?php
+$index = 0;
+foreach ($DateTimeValues1 as $dateTime) {
+    echo "[Date.UTC(" . substr($dateTime, 0, 4) . "," . (substr($dateTime, 5, 2) - 1) . "," . substr($dateTime, 8, 2) . "," . substr($dateTime, 11, 2) . "," . substr($dateTime, 14, 2) . "),$WindSpeedValues1[$index]],\n";
+    $index++;
+}
+?>
+                    ],
+                    tooltip: {
+                        valueSuffix: ' km/h'
+                    }},
+                {
+                    name: 'Temperatur Datenreihe 2',
+                    yAxis: 0,
+                    xAxis: 1,
+                    color: '#FF00BF',
+                    data: [
+<?php
+$index = 0;
+foreach ($DateTimeValues2 as $dateTime) {
+    echo "[Date.UTC(" . substr($dateTime, 0, 4) . "," . (substr($dateTime, 5, 2) - 1) . "," . substr($dateTime, 8, 2) . "," . substr($dateTime, 11, 2) . "," . substr($dateTime, 14, 2) . "),$TemperatureValues2[$index]],\n";
+    $index++;
+}
+?>
+                    ],
+                    tooltip: {
+                        valueSuffix: ' C°'
+                    }}, {
+                    name: 'Windstärke Datenreihe 2',
+                    yAxis: 1,
+                    xAxis: 1,
+                    color: '#58D3F7',
+                    data: [
+<?php
+$index = 0;
+foreach ($DateTimeValues2 as $dateTime) {
+    echo "[Date.UTC(" . substr($dateTime, 0, 4) . "," . (substr($dateTime, 5, 2) - 1) . "," . substr($dateTime, 8, 2) . "," . substr($dateTime, 11, 2) . "," . substr($dateTime, 14, 2) . "),$WindSpeedValues2[$index]],\n";
+    $index++;
+}
+?>
+                    ],
+                    tooltip: {
+                        valueSuffix: ' km/h'
+                    }}],
+            legend: {enabled: false}
+        });
+    });</script>
+
+
